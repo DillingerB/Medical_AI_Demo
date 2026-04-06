@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+  <title>Medical Analysis</title>
+</head>
+<body>
+
+<div class="sidebar">
+  <button onclick="showTab('home')">Home</button>
+  <button onclick="showTab('about')">About</button>
+  <button onclick="showTab('prescription')">Prescription</button>
+  <a href="index.html"><button>Log-Out</button></a>
+</div>
+
+<div class="main">
+  <h1 id="welcome"></h1>
+
+  <!-- HOME -->
+  <div id="home" class="tab">
+    <h2>Closest Timer: <span id="closestTimer">None</span></h2>
+    <div id="homeList"></div>
+  </div>
+
+  <!-- ABOUT -->
+  <div id="about" class="tab hidden">
+    <h2>About</h2>
+    <h3>Meet the creators of the app:</h3>
+    <P>Dillinger Bennett:</P>
+    <p>Hi, I am dillinger, I do most of the front-end development and some of the design work, I also do some of the debugging in this.</p><br>
+    <p>Cale  Rollstone:</p>
+    <p></p><br>
+    <p>Wattana Keosombath:</p>
+    <p></p><br>
+    <p>Garrett Keller:</p>
+    <p></p><br>
+    <p>Sameer Fazlani:</p>
+    <p></p><br>
+    <p>Wyatt Alexander:</p>
+    <p></p><br>
+  </div>
+
+  <!-- PRESCRIPTION -->
+  <div id="prescription" class="tab hidden">
+    <h2>Add Prescription</h2>
+
+    <input id="name" placeholder="Medication">
+    <input id="dosage" placeholder="Dosage">
+
+    <select id="type">
+      <option value="">Select</option>
+      <option value="hours">Hours</option>
+      <option value="daily">Daily</option>
+    </select>
+
+    <input id="value" placeholder="Value">
+
+    <button onclick="addPrescription()">Add</button>
+
+    <div id="list"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

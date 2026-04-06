@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Medical AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="center">
+  <h1>Medical AI</h1>
+
+  <!-- USERNAME -->
+  <input id="username" placeholder="Username">
+  <div class="error" id="userError"></div>
+
+  <!-- PASSWORD -->
+  <input id="password" type="password" placeholder="Password" onfocus="showPasswordHelp()">
+  <div class="hint" id="passwordHint"></div>
+  <div class="error" id="passError"></div>
+
+  <button onclick="signup()">Sign Up</button>
+  <button onclick="login()">Log In</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
