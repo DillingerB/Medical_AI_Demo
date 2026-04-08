@@ -4,31 +4,43 @@ document.getElementById("welcome").innerText = "Welcome " + user;
 let prescriptions = JSON.parse(localStorage.getItem("prescriptions") || "[]");
 
 function showPasswordHelp() {
-    document.getElementById("passwordHint").innerText = 
-    "Password must be 8-20 characters";
+    const hint = document.getElementById("passwordHint");
+    hint.innerText = "Password must be 8-20 characters";
+    hint.classList.add("active");
+}
+
+function hidePasswordHelp() {
+  document.getElementById("passwordHint").classList.remove("active");
 }
 
 function validateAuth(username, password) {
     let valid = true;
 
-    document.getElementById("username").innerText = "";
-    document.getElementById("password").innerText = "";
+    const userError = document.getElementById("userError");
+    const passError = document.getElementById("passError");
 
-    if (!username) {
-        document.getElementById("userError").innerText = "Must be filled in";
+    userError.innerText = "";
+    passError.innerText = "";
+
+    userError.classList.remove("active");
+    passError.classList.remove("active");
+
+      if (!username) {
+        userError.innerText = "Username must be filled in.";
+        userError.classList.add("active");
         valid = false;
-    }
+      }
 
-    if (!password) {
-    document.getElementById("passError").innerText = "Must be filled in";
-    valid = false;
-  } else if (password.length < 8 || password.length > 20) {
-    document.getElementById("passError").innerText =
-      "Password must be 8–20 characters";
-    valid = false;
-  }
-
-  return valid;
+      if (!password) {
+        passError.innerText = "Password must be filled in.";
+        passError.classList.add("active");
+        valid = false;
+      } else if (password.length < 8 || password.length >20) {
+        passError.innerText = "Password must be 8-20 characters";
+        passError.classList.add("active");
+        valid = false;
+      }
+      return valid;
 }
 
 function signup() {
@@ -75,7 +87,7 @@ function addPrescription() {
   const type = document.getElementById("type").value;
   const value = parseInt(document.getElementById("value").value);
 
-  // ❌ Test Case: Invalid input
+  //Test Case: Invalid input
   if (!name || !dosage || !type || !value) {
     alert("All fields required");
     return;
@@ -105,7 +117,7 @@ function takePill(id) {
       ? med.value * 3600
       : med.value * 86400;
 
-    // ❌ Test Case: Too early
+    // Test Case: Too early
     if (diff < limit) {
       alert("Taking anymore pills can be harmful, please wait.");
       return;
@@ -180,8 +192,15 @@ setInterval(() => {
     if (remaining < closest) closest = remaining;
   });
 
-  document.getElementById("closestTimer").innerText =
-    closest === Infinity ? "None" : Math.floor(closest) + " sec";
+  if (closest === Infinity) {
+    document.getElementById("closestTimer").innerText = "None"
+  } else {
+    const h = Math.floor(closest / 3600);
+    const m = Math.floor((closest % 3600) / 60);
+    const s = Math.floor(closest % 60);
+
+    document.getElementById("closestTimer").innerText = `${h}h ${m}m ${s}s`;
+  }
 
 }, 1000);
 

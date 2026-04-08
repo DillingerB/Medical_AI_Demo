@@ -4,22 +4,22 @@
   <title>Medical AI</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="intro">
 
 <div class="center">
   <h1>Medical AI</h1>
 
   <!-- USERNAME -->
-  <input id="username" placeholder="Username">
+  <input type="text" id="username" placeholder="Username">
   <div class="error" id="userError"></div>
 
   <!-- PASSWORD -->
-  <input id="password" type="password" placeholder="Password" onfocus="showPasswordHelp()">
+  <input type="password" id="password" placeholder="Password" onfocus="showPasswordHelp()" onblur="hidePasswordHelp()">
   <div class="hint" id="passwordHint"></div>
   <div class="error" id="passError"></div>
 
-  <button onclick="signup()">Sign Up</button>
-  <button onclick="login()">Log In</button>
+  <button id="signup" onclick="signup()">Sign Up</button>
+  <button id="login" onclick="login()">Log In</button>
 </div>
 
 <script src="app.js"></script>
