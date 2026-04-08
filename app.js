@@ -85,10 +85,16 @@ function addPrescription() {
   const name = document.getElementById("name").value;
   const dosage = document.getElementById("dosage").value;
   const type = document.getElementById("type").value;
-  const value = parseInt(document.getElementById("value").value);
+  let value = document.getElementById("value").value;
+
+  if (type === "daily") {
+    value = 1;
+  } else {
+    value = parseInt(value);
+  }
 
   //Test Case: Invalid input
-  if (!name || !dosage || !type || !value) {
+  if (!name || !dosage || !type || (type === "hours" && !value)) {
     alert("All fields required");
     return;
   }
@@ -157,11 +163,35 @@ function card(m, showButtons) {
       ${showButtons ? `
         <button onclick="takePill(${m.id})">Take Pill</button>
         <button>Refill</button>
+        <button onclick="deletePrescription(${m.id})">Delete</button>
       ` : ""}
 
       <p>Timer: <span id="t-${m.id}">Not started</span></p>
     </div>
   `;
+}
+
+function deletePrescription(id) {
+  // Find prescription by id
+  const med = prescriptions.find(m => m.id === id);
+  if (!med) return;
+
+  // Ask for confirmation
+  const confirmed = confirm(`Are you sure you want to delete "${med.name}"?`);
+  if (!confirmed) return;
+
+  // Remove from prescriptions array
+  prescriptions = prescriptions.filter(m => m.id !== id);
+
+  // Save updated list to localStorage
+  localStorage.setItem("prescriptions", JSON.stringify(prescriptions));
+
+  // Remove card element from DOM
+  const cardEl = document.getElementById(`card-${id}`);
+  if (cardEl) cardEl.remove();
+
+  // Re-render timers and home list
+  render();
 }
 
 // TIMER LOOP

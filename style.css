@@ -22,34 +22,24 @@ body {
   text-align: center;
 }
 
-#username {
+#username, #password {
   width: 75%;
-  padding: 5px 5px;
+  padding: 12px 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   background-color: rgba(190, 231, 255);
 }
 
-#password {
-  width: 75%;
-  padding: 5px 5px;
-  border: none;
-  border-radius: 4px;
-  background-color: rgb(190, 231, 255);
-}
-
-#signup {
+#signup, #login {
   width: 75px;
   border: none;
   background-color:rgba(190, 231, 255);
   border-radius: 4px;
 }
 
-#login {
-  width: 75px;
-  border: none;
-  background-color:rgba(190, 231, 255);
-  border-radius: 4px;
+#signup:hover, #login:hover {
+  cursor: pointer;
+  background-color: rgb(163, 215, 245);
 }
 
 .sidebar {
@@ -106,6 +96,14 @@ body {
   padding: 10px;
   margin-top: 10px;
   border-radius: 6px;
+  width: 220px;
+  min-height: 120px;
+}
+
+#list, #homeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .hidden {
@@ -154,4 +152,69 @@ body {
 .hint.active {
   opacity: 1;
   pointer-events: auto;
+}
+
+#pre_form {
+  margin-top: 50px;
+  width: 50%;
+  border: none;
+  background-color: white;
+  border-radius: 25px;
+  margin: 50px auto;
+  width: 227px;
+  height: auto;
+  padding: 15px 10px;
+  text-align: center;
+}
+
+#name {
+  border: none;
+  background-color: lavender;
+  margin-inline: none;
+  padding: 5px 5px;
+  border-radius: 25px;
+  margin: 4px auto;
+}
+
+#dosage {
+  border: none;
+  background-color: lavender;
+  padding: 5px 5px;
+  border-radius: 25px;
+  margin: 4px auto;
+}
+
+#type {
+  border: none;
+  background-color: lavender;
+  padding: 5px 5px;
+  border-radius: 25px;
+  margin: 4px auto;
+}
+
+#value {
+  border: none;
+  background-color: lavender;
+  padding: 5px 5px;
+  border-radius: 25px;
+  margin: 4px auto;
+}
+
+#add {
+  border: none;
+  background-color: lavender;
+  padding: 5px 5px;
+  border-radius: 25px;
+  width: 35%;
+}
+
+#add:hover {
+  cursor: pointer;
+}
+
+.main {
+  background-color:rgb(190, 231, 255);
+  background-position: center top;
+  background-size: cover;
+  min-height: 100dvh;
 }
