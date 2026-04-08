@@ -187,9 +187,10 @@ setInterval(() => {
     const m2 = Math.floor((remaining%3600)/60);
     const s = Math.floor(remaining%60);
 
-    el.innerText = `${h}h ${m2}m ${s}s`;
+    el.innerText = `${h}:${m2}:${s}`;
 
     if (remaining < closest) closest = remaining;
+    if (remaining === 0 ) return;
   });
 
   if (closest === Infinity) {
@@ -199,7 +200,7 @@ setInterval(() => {
     const m = Math.floor((closest % 3600) / 60);
     const s = Math.floor(closest % 60);
 
-    document.getElementById("closestTimer").innerText = `${h}h ${m}m ${s}s`;
+    document.getElementById("closestTimer").innerText = `${h}:${m}:${s}`;
   }
 
 }, 1000);
