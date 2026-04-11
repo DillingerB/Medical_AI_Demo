@@ -18,10 +18,19 @@
   <div class="hint" id="passwordHint"></div>
   <div class="error" id="passError"></div>
 
-  <button id="signup" onclick="signup()">Sign Up</button>
-  <button id="login" onclick="login()">Log In</button>
+  <!-- patient/provider -->
+   <input type="checkbox" id="patient" name="patient">
+   <label for="patient">Patient</label>
+
+   <input type="checkbox" id="medical-providor" name="medical-providor">
+   <label for="medical-providor">Medical Providor</label>
+   <div class="error" id="roleError"></div>
+
+  <button id="signup" onclick="auth.signup()">Sign Up</button>
+  <button id="login" onclick="auth.login()">Log In</button>
 </div>
 
+<script src="auth.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

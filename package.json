@@ -1,0 +1,28 @@
+{
+  "name": "medical_ai_demo",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/DillingerB/Medical_AI_Demo#readme",
+  "bugs": {
+    "url": "https://github.com/DillingerB/Medical_AI_Demo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DillingerB/Medical_AI_Demo.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.0"
+  }
+}
