@@ -13,7 +13,7 @@ function initDashboard() {
     return;
   }
 
-  document.getElementById("welcome").innerText = "Welcome" + user;
+  document.getElementById("welcome").innerText = "Welcome " + user;
 
   prescriptions.load().then(() => timer.start());
 }

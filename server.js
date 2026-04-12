@@ -120,6 +120,26 @@ app.post("/api/prescriptions", async (req, res) => {
 
     if (!user) return res.status(401).json({ error: "User not found." });
 
+    const [existing] = await pool.query(
+      "SELECT name FROM prescriptions WHERE user_id = ?",
+      [user.id]
+    );
+
+    const interactions = [];
+    for (const ex of existing) {
+      const [rows] = await pool.query(
+        `SELECT severity, description FROM drug_interactions WHERE (med_a = ? AND med_b = ?) OR (med_a = ? AND med_b = ?)`,
+        [name, ex.name, ex.name, name]
+      );
+      if (rows.length > 0) {
+        interactions.push({
+          with: ex.name,
+          severity: rows[0].severity,
+          description: rows[0].description,
+        });
+      }
+    }
+
     const [result] = await pool.query(
       "INSERT INTO prescriptions (user_id, name, dosage, type, value) VALUES (?, ?, ?, ?, ?)",
       [user.id, name, dosage, type, value]
@@ -127,8 +147,12 @@ app.post("/api/prescriptions", async (req, res) => {
 
     res.status(201).json({
       id: result.insertId,
-      name, dosage, type, value,
+      name, 
+      dosage, 
+      type, 
+      value,
       last_taken: null,
+      interactions,
     });
   } catch (err) {
     console.error("Add prescription error:", err);

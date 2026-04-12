@@ -50,6 +50,18 @@ class PrescriptionManager {
             this.items.push(med);
             this.render();
 
+            if(med.interactions && med.interactions.length > 0) {
+                const warningEl = document.getElementById("interactionWarning");
+
+                const messages = med.interactions.map(i => `${i.severity.toUpperCase()}: ${med.name} + ${i.with} - ${i.description}`);
+
+                warningEl.innerHTML = messages.join("<br>");
+                warningEl.classList.add("active");
+            } else {
+
+                document.getElementById("interactionWarning").classList.remove("active");
+            }
+
             document.getElementById("name").value = "";
             document.getElementById("dosage").value = "";
             document.getElementById("type").value = "";
@@ -90,11 +102,11 @@ class PrescriptionManager {
     }
 
     //Delete a prescription
-    async delete(id) {
+    async deletePrescription(id) {
         const med = this.items.find(m => m.id == id);
         if (!med) return;
 
-        const confirmed = confirm(`Delete "${med.name}"?`);
+        const confirmed = confirm(`Would you like to delete "${med.name}"?`);
         if (!confirmed) return;
 
         try {
