@@ -120,6 +120,13 @@ app.post("/api/prescriptions", async (req, res) => {
 
     if (!user) return res.status(401).json({ error: "User not found." });
 
+    const [[brand]] = await pool.query(
+      "SELECT generic_name FROM brand_names WHERE brand_name = ?",
+      [name]
+    ).catch(() => [[null]]);
+
+    const genericName = brand ? brand.generic_name : name;
+
     const [existing] = await pool.query(
       "SELECT name FROM prescriptions WHERE user_id = ?",
       [user.id]
@@ -127,9 +134,17 @@ app.post("/api/prescriptions", async (req, res) => {
 
     const interactions = [];
     for (const ex of existing) {
+
+      const [[exBrand]] = await pool.query(
+        "SELECT generic_name FROM brand_names WHERE brand_name = ?",
+        [ex.name]
+      ).catch(() => [[null]]);
+
+      const exGeneric = exBrand ? exBrand.generic_name : ex.name;
+
       const [rows] = await pool.query(
         `SELECT severity, description FROM drug_interactions WHERE (med_a = ? AND med_b = ?) OR (med_a = ? AND med_b = ?)`,
-        [name, ex.name, ex.name, name]
+        [genericName, exGeneric, exGeneric, genericName]
       );
       if (rows.length > 0) {
         interactions.push({
@@ -209,6 +224,44 @@ app.delete("/api/prescriptions/:id", async (req, res) => {
     res.json({ message: "Deleted." });
   } catch (err) {
     console.error("Delete error:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+app.post("/api/alerts", async (req, res) => {
+  const username = getCurrentUser(req);
+  if (!username) return res.status(401).json({error: "Not authenticated."});
+
+  const { message, severity } = req.body;
+
+  try {
+    const [[user]] = await pool.query(
+      "SELECT id FROM users WHERE username = ?", [username]
+    );
+
+    await pool.query(
+      "INSERT INTO alerts (user_id, message, severity) VALUES (?, ?, ?)",
+      [user.id, message, severity]
+    );
+
+    res.status(201).json({message: "Alert saved."});
+  } catch (err) {
+    console.error("Save alert error:", err);
+    res.status(500).json({ error: "Internal server error."});
+  }
+});
+
+app.get("/api/alerts", async (req, res) => {
+  const username = getCurrentUser(req);
+  if (!username) return res.status(401).json({ error: "Not authenticated." });
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT a.message, a.severity, a.created_at FROM alerts a JOIN users u on u.id = a.user_id WHERE u.username = ? ORDER BY a.created_at DESC`, [username]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("Get alerts error:", err);
     res.status(500).json({ error: "Internal server error." });
   }
 });

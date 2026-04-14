@@ -19,7 +19,7 @@ class PrescriptionManager {
 
     //add prescriptions for user
     async add() {
-        const name = document.getElementById("name").value.trim();
+        const name = document.getElementById("name").value.trim().toLowerCase();
         const dosage = document.getElementById("dosage").value.trim();
         const type = document.getElementById("type").value;
         let value = document.getElementById("value").value;
@@ -52,11 +52,32 @@ class PrescriptionManager {
 
             if(med.interactions && med.interactions.length > 0) {
                 const warningEl = document.getElementById("interactionWarning");
+                const alertsList = document.getElementById("alertsList");
 
-                const messages = med.interactions.map(i => `${i.severity.toUpperCase()}: ${med.name} + ${i.with} - ${i.description}`);
+                const messages = med.interactions.map(i => 
+                    `${i.severity.toUpperCase()}: ${med.name} + ${i.with} - ${i.description}`
+                );
 
                 warningEl.innerHTML = messages.join("<br>");
                 warningEl.classList.add("active");
+
+                for (const i of med.interactions) {
+                    const msg = `${i.severity.toUpperCase()}: ${med.name} + ${i.with} - ${i.description}`;
+
+                    await fetch("/api/alerts", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "x-username": sessionStorage.getItem("user"),
+                        },
+                        body: JSON.stringify({ message: msg, severity: i.severity }),
+                    });
+
+                    const entry = document.createElement("div");
+                    entry.className = "error active";
+                    entry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${msg}`;
+                    alertsList.appendChild(entry);
+                }
             } else {
 
                 document.getElementById("interactionWarning").classList.remove("active");

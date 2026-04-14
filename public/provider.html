@@ -2,6 +2,7 @@
 <html>
 <head>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/jpg" href="favicon.jpg">
   <title>Medical Analysis</title>
 </head>
 <body>
@@ -10,7 +11,7 @@
   <button onclick="showTab('home')">Home</button>
   <button onclick="showTab('about')">About</button>
   <button onclick="showTab('prescription')">Prescription</button>
-  <button onclick="showTab('personal')">Personal</button>
+  <button onclick="showTab('alerts')">Notifications</button>
   <a href="index.html"><button>Log-Out</button></a>
 </div>
 
@@ -82,13 +83,15 @@
       <input type="number" id="value" placeholder="Value">
 
       <button id="add" onclick="prescriptions.add()">Add</button>
+      <div class="error" id="interactionWarning"></div>
     </div>
     <div id="list"></div>
   </div>
 
-  <!-- Personal -->
-  <div id="personal" class="tab hidden">
-    <h1>Enter Personal Info:</h1>
+  <!-- Alert system -->
+  <div id="alerts" class="tab hidden">
+    <h1>Current Alerts:</h1>
+    <div id="alertsList"></div>
   </div>
 </div>
 
