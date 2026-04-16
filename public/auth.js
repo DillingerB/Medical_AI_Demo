@@ -69,11 +69,15 @@ class Auth {
         const { username, password } = this.getCredentials();
         if (!this.validateAuth(username, password, true)) return;
 
+        const patient  = document.getElementById("patient").checked;
+        const provider = document.getElementById("medical-providor").checked;
+        const role = provider ? "provider" : "patient";
+
         try {
             const res = await fetch("/api/auth/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ username, password, role }),
             });
 
             const data = await res.json();
@@ -84,8 +88,12 @@ class Auth {
                 return;
             }
 
-            sessionStorage.setItem("user", username);
-            window.location.href = "dashboard.html";
+            if (data.provider_code) {
+                alert(`Your provider code is: ${data.provider_code}\nShare this with your patients so they can link to you.`);
+            }
+
+            //sessionStorage.setItem("user", username);
+            window.location.href = "index.html";
         } catch (err) {
             console.error("Signup error:", err);
             alert("Could not connect to server. Please try again.");
@@ -112,7 +120,11 @@ class Auth {
                 return;
             }
             sessionStorage.setItem("user", username);
-            window.location.href = "dashboard.html";
+            sessionStorage.setItem("role", data.role);
+            if (data.provider_code) {
+                sessionStorage.setItem("provider_code", data.provider_code);
+            }
+            window.location.href = data.role === "provider" ? "provider.html" : "dashboard.html";
         } catch (err) {
             console.error("Login error:", err);
             alert("Could not connect to server. Please try again.");

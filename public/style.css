@@ -238,3 +238,82 @@ label[for="patient"], label[for="medical-providor"] {
   background-size: cover;
   min-height: 100dvh;
 }
+
+#providerCodeDisplay {
+  font-size: .95rem;
+  color: #555;
+  margin-top: -10px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.patient-card {
+  background: white;
+  padding: 10px;
+  margin-top: 25px;
+  border-radius: 6px;
+  width: 300px;
+  min-height: 120px;
+}
+
+.patient-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+
+.patient-card button {
+  margin-right: 8px;
+  margin-bottom: 10px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(190, 231, 255);
+}
+
+.patient-card button:hover {
+  background-color: rgb(163, 215, 245);
+  cursor: pointer;
+}
+
+.patient-card input,
+.patient-card select {
+  display: block;
+  width: 200px;
+  padding: 8px 12px;
+  margin: 6px 0;
+  border: 1.5px solid #dde3ee;
+  border-radius: 10px;
+  background: #f7f9fc;
+  font-size: .9rem;
+}
+
+#providerUsername {
+  border: none;
+  background-color: lavender;
+  margin-inline: none;
+  padding: 5px 5px;
+  border-radius: 25px;
+  margin: 4px auto;
+}
+
+#providerCode {
+  border: none;
+  background-color: lavender;
+  margin-inline: none;
+  padding: 5px 5px;
+  border-radius: 25px;
+  margin: 4px auto;
+}
+
+#linkProvider {
+  border: none;
+  background-color: lavender;
+  padding: 5px 5px;
+  border-radius: 25px;
+  width: 50%;
+}
+
+#linkProvider:hover {
+  cursor: pointer;
+  background-color: rgb(206, 206, 255);
+}

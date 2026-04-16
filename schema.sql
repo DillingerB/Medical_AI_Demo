@@ -3,39 +3,52 @@ CREATE DATABASE IF NOT EXISTS medical_ai_demo;
 USE medical_ai_demo;
 
 CREATE TABLE users (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id            INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+  username      VARCHAR(50)     NOT NULL UNIQUE,
+  role ENUM('patient', 'provider') NOT NULL DEFAULT 'patient',
+  provider_code VARCHAR(8) UNIQUE DEFAULT NULL,
+  password_hash VARCHAR(255)    NOT NULL,
+  created_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE patient_provider (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    patient_id INT UNSIGNED NOT NULL,
+    provider_id INT UNSIGNED NOT NULL,
+    linked_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_patient (patient_id),
+    FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (provider_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE prescriptions (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    dosage VARCHAR(100) NOT NULL,
-    frequencyType ENUM('hours', 'daily') NOT NULL,
-    frequencyValue INT NOT NULL,
-    lastTaken DATETIME DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    FOREIGN KEY (user_id) REFERENCES users(id)
-		ON DELETE CASCADE
+  id          INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+  user_id     INT UNSIGNED    NOT NULL,
+  name        VARCHAR(100)    NOT NULL,
+  dosage      VARCHAR(50)     NOT NULL,
+  type        ENUM('hours','daily') NOT NULL,
+  value       SMALLINT UNSIGNED NOT NULL COMMENT 'hours between doses',
+  last_taken  DATETIME        DEFAULT NULL,
+  created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE known_medications (
-	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL UNIQUE,
-    PRIMARY KEY (id)
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE drug_interactions (
-	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    med_a VARCHAR(100) NOT NULL,
-    med_b VARCHAR(100) NOT NULL,
-    severity ENUM('minor', 'moderate', 'severe') NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    PRIMARY KEY (id)
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  med_a VARCHAR(100) NOT NULL,
+  med_b VARCHAR(100) NOT NULL,
+  severity ENUM('minor', 'moderate', 'severe') NOT NULL,
+  description VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE brand_names (

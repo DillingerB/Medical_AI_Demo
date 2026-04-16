@@ -3,7 +3,7 @@
 <head>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/jpg" href="favicon.jpg">
-  <title>Medical Analysis</title>
+  <title>Medical Analysis - Patient</title>
 </head>
 <body>
 
@@ -12,6 +12,7 @@
   <button onclick="showTab('about')">About</button>
   <button onclick="showTab('prescription')">Prescription</button>
   <button onclick="showTab('alerts')">Notifications</button>
+  <button onclick="showTab('link')">Link Provider</button>
   <a href="index.html"><button>Log-Out</button></a>
 </div>
 
@@ -93,6 +94,19 @@
     <h1>Current Alerts:</h1>
     <div id="alertsList"></div>
   </div>
+
+  <div id="link" class="tab hidden">
+    <h1>Link your medical provider</h1>
+    <div id="pre_form">
+      <h2>Enter Provider Details</h2>
+      <input type="text" id="providerUsername" placeholder="Provider Username">
+      <input type="text" id="providerCode" placeholder="Provider Code">
+      <button onclick="linkProvider()" id="linkProvider">Link Provider</button>
+      <div class="error" id="linkError"></div>
+      <div class="hint" id="linkSuccess"></div>
+    </div>
+  </div>
+
 </div>
 
 <script src="prescriptions.js"></script>

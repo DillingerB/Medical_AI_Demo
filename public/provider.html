@@ -3,25 +3,26 @@
 <head>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/jpg" href="favicon.jpg">
-  <title>Medical Analysis</title>
+  <title>Medical Analysis - Provider</title>
 </head>
 <body>
 
 <div class="sidebar">
   <button onclick="showTab('home')">Home</button>
   <button onclick="showTab('about')">About</button>
-  <button onclick="showTab('prescription')">Prescription</button>
+  <button onclick="showTab('patients')">My Patients</button>
   <button onclick="showTab('alerts')">Notifications</button>
   <a href="index.html"><button>Log-Out</button></a>
 </div>
 
 <div class="main">
   <h1 id="welcome"></h1>
+  <p id="providerCodeDisplay"></p>
 
   <!-- HOME -->
   <div id="home" class="tab">
-    <br><h2>Closest Timer: <span id="closestTimer">None</span></h2>
-    <div id="homeList"></div>
+    <h2>Provider Dashboard</h2>
+    <p>Use the <strong>My Patients</strong> tab to view your linked patients, send prescriptions, and view their alerts.</p>
   </div>
 
   <!-- ABOUT -->
@@ -30,7 +31,7 @@
 
     <div id="WHAT">
     <h3>What this app does for you, the user:</h3>
-    <p>Granted this came form a project, but this is supposed to help you be less risky with certain medications, prevent OD, and other means of something bad happening with your prescriptions. We want to prevent any harm, and have the causes lessen in this sense. So our AI will help prevent this, sending alert notifications to you incase something harmful pops up in it's database, could be taking too much of the medication, could be mixing prescriptions that could end up being dangerous. It's here to help YOU the reader.</p>
+    <p>Granted this came from a project, but this is supposed to help you be less risky with certain medications, prevent OD, and other means of something bad happening with your prescriptions. We want to prevent any harm, and have the causes lessen in this sense. So our AI will help prevent this, sending alert notifications to you incase something harmful pops up in it's database, could be taking too much of the medication, could be mixing prescriptions that could end up being dangerous. It's here to help YOU the reader.</p>
     </div>
 
     <h3>Meet the creators of the app:</h3>
@@ -67,30 +68,14 @@
   </div>
 
   <!-- PRESCRIPTION -->
-  <div id="prescription" class="tab hidden">
-    <div id="pre_form">
-      <h2>Add Prescription</h2>
-
-      <input type="text" id="name" placeholder="Medication">
-      <input type="text" id="dosage" placeholder="Dosage">
-
-      <select id="type">
-        <option value="">Select</option>
-        <option value="hours">Hours</option>
-        <option value="daily">Daily</option>
-      </select>
-
-      <input type="number" id="value" placeholder="Value">
-
-      <button id="add" onclick="prescriptions.add()">Add</button>
-      <div class="error" id="interactionWarning"></div>
-    </div>
-    <div id="list"></div>
+  <div id="patients" class="tab hidden">
+    <h1>My Patients</h1>
+    <div id="patientList"></div>
   </div>
 
   <!-- Alert system -->
   <div id="alerts" class="tab hidden">
-    <h1>Current Alerts:</h1>
+    <h1>Alerts:</h1>
     <div id="alertsList"></div>
   </div>
 </div>
