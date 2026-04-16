@@ -92,8 +92,12 @@ class Auth {
                 alert(`Your provider code is: ${data.provider_code}\nShare this with your patients so they can link to you.`);
             }
 
-            //sessionStorage.setItem("user", username);
-            window.location.href = "index.html";
+            sessionStorage.setItem("user", username);
+            sessionStorage.setItem("role", data.role);
+            if (data.provider_code) {
+                sessionStorage.setItem("provider_code", data.provider_code);
+            }
+            window.location.href = data.role === "provider" ? "provider.html" : "dashboard.html";
         } catch (err) {
             console.error("Signup error:", err);
             alert("Could not connect to server. Please try again.");

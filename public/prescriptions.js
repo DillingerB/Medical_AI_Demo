@@ -35,6 +35,11 @@ class PrescriptionManager {
             return;
         }
 
+        if (value < 0) {
+            alert("Value must be greater than 0.");
+            return;
+        }
+
         try {
             const res = await fetch("/api/prescriptions", {
                 method: "POST",

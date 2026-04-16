@@ -48,6 +48,7 @@ app.post("/api/auth/signup", async (req, res) => {
 
     res.status(201).json({ 
       message: "Account created.",
+      role: role,
       provider_code: providerCode,
     });
   } catch (err) {
@@ -121,6 +122,9 @@ app.post("/api/prescriptions", async (req, res) => {
 
   if (!name || !dosage || !type || value == null) {
     return res.status(400).json({ error: "All fields are required." });
+  }
+  if (value < 0) {
+    return res.status(400).json({ error: "Value must be greater than 0." });
   }
 
   try {

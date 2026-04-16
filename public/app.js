@@ -130,7 +130,7 @@ async function loadPatients() {
         <div class="card">
           <h3>${p.name} (${p.dosage}</h3>
           <p>Every ${p.value} ${p.type}</p>
-          <p>Timer: <span id="t-${p.id}">--</span></p>
+          <p>Timer: <span id="t-${p.id}">${calcTimer(p.last_taken, p.value)}</span></p>
         </div>
         `).join("")
         : "<p>No prescriptions on file.</p>";
@@ -262,3 +262,19 @@ document.addEventListener("DOMContentLoaded", () => {
   if (welcomeEl && isProvider) initProvider();
   else if (welcomeEl) initDashboard();
 });
+
+function calcTimer(lastTaken, value) {
+  if(!lastTaken) return "Not started";
+
+  const limit = value * 3600 *1000;
+  const elapsed = Date.now() - new Date(lastTaken).getTime();
+  const remaining = Math.max(0, limit - elapsed) / 1000;
+
+  if (remaining === 0) return "Ready";
+
+  const h = Math.floor(remaining / 3600);
+  const m = Math.floor((remaining % 3600) / 60);
+  const s = Math.floor(remaining % 60);
+  
+  return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}

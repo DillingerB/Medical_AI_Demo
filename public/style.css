@@ -65,19 +65,39 @@ label[for="patient"], label[for="medical-providor"] {
 .sidebar {
   width: 200px;
   height: 100vh;
-  background: #1e2a38;
+  background-color: #1e2a38;
   position: fixed;
 }
 
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .sidebar button {
-  display: block;
+  display: inline-block;
   width: 100%;
   padding: 15px;
   color: white;
   background: none;
   border: none;
   text-align: left;
+  animation: slideIn 0.5s ease-out forwards;
+  opacity: 0;
 }
+
+.sidebar button:nth-child(2) { animation-delay: 0.1s; }
+.sidebar button:nth-child(3) { animation-delay: 0.2s; }
+.sidebar button:nth-child(4) { animation-delay: 0.3s; }
+.sidebar button:nth-child(5) { animation-delay: 0.4s; }
+.sidebar button:nth-child(6) { animation-delay: 0.5s; }
+.sidebar a button { animation-delay: 0.6s; }
 
 .sidebar button:hover {
     background-color: rgba(0, 0, 128, 0.685);
@@ -316,4 +336,18 @@ label[for="patient"], label[for="medical-providor"] {
 #linkProvider:hover {
   cursor: pointer;
   background-color: rgb(206, 206, 255);
+}
+
+#logo {
+  
+background-image: linear-gradient(to right, rgb(180, 180, 255), rgb(255, 177, 255));
+-webkit-background-clip: text;
+background-clip: text;
+color: transparent;
+display: inline-block;
+margin-left: 65px;
+}
+
+#welcome {
+  padding: 5px;
 }
