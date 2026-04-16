@@ -60,14 +60,14 @@ class PrescriptionManager {
                 const alertsList = document.getElementById("alertsList");
 
                 const messages = med.interactions.map(i => 
-                    `${i.severity.toUpperCase()}: ${med.name} + ${i.with} - ${i.description}`
+                    `<strong>${i.severity.toUpperCase()}</strong>: ${med.name} + ${i.with} - ${i.description}`
                 );
 
                 warningEl.innerHTML = messages.join("<br>");
                 warningEl.classList.add("active");
 
                 for (const i of med.interactions) {
-                    const msg = `${i.severity.toUpperCase()}: ${med.name} + ${i.with} - ${i.description}`;
+                    const msg = `<strong>${i.severity.toUpperCase()}</strong>: ${med.name} + ${i.with} - ${i.description}`;
 
                     await fetch("/api/alerts", {
                         method: "POST",
