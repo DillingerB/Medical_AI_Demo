@@ -27,6 +27,9 @@ app.post("/api/auth/signup", async (req, res) => {
   if (!username || !password || !role) {
     return res.status(400).json({ error: "All fields are required." });
   }
+  if ( username > 50 ) {
+    return res.status(400).json({ error: "Username must be less than 50 characters."});
+  }
 
   try {
     const [rows] = await pool.query(
@@ -192,6 +195,7 @@ app.post("/api/prescriptions", async (req, res) => {
   }
 });
 
+//provider sending prescrption to patient.
 app.post("/api/prescriptions/send", async (req, res) => {
   const username = getCurrentUser(req);
   if (!username) return res.status(401).json({ error: "Not authenticated."});
