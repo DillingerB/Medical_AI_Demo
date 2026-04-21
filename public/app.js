@@ -25,7 +25,7 @@ async function loadAlerts() {
     alerts.forEach(alert => {
       const time = new Date(alert.created_at).toLocaleString([], {hour: '2-digit', minute: '2-digit'}) ;
       const entry = document.createElement("div");
-      entry.className = "error active";
+      entry.className = `error active alert-${alert.severity}`;
       entry.innerHTML = `<strong>${time}</strong> - ${alert.message}`;
       alertsList.appendChild(entry);
     });

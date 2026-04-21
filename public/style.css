@@ -350,3 +350,22 @@ margin-left: 37px;
 #welcome {
   padding: 5px;
 }
+
+#alertsList .error {
+  width: 90%;
+  margin: 6px auto;
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-size: 14px;
+  text-align: left;
+}
+
+#alertsList .alert-minor {
+  background-color: rgb(250, 255, 205);
+}
+#alertsList .alert-moderate {
+  background-color: rgb(255, 219, 192);
+}
+#alertsList .alert-info {
+  background-color: rgb(158, 255, 161);
+}

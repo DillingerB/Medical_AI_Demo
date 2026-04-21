@@ -29,7 +29,7 @@ CREATE TABLE prescriptions (
   name        VARCHAR(100)    NOT NULL,
   dosage      VARCHAR(50)     NOT NULL,
   type        ENUM('hours','daily') NOT NULL,
-  value       SMALLINT UNSIGNED NOT NULL COMMENT 'hours between doses',
+  value       SMALLINT UNSIGNED NOT NULL,
   last_taken  DATETIME        DEFAULT NULL,
   created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -67,6 +67,20 @@ CREATE TABLE alerts (
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE dosage_limits (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    generic_name VARCHAR(100) NOT NULL UNIQUE,
+    max_single_otc DECIMAL(8,2) DEFAULT NULL,
+    max_single DECIMAL(8,2) NOT NULL,
+    max_daily_otc DECIMAL(8,2) DEFAULT NULL,
+    max_daily DECIMAL(8,2) NOT NULL,
+    unit VARCHAR(20) NOT NULL DEFAULT 'mg',
+    PRIMARY KEY (id)
+);
+
+INSERT INTO dosage_limits (generic_name, max_single, max_single_otc, max_daily, max_daily_otc, unit) VALUES
+('ibuprofen', '800', '400', '3200', '1200', 'mg');
 
 INSERT INTO brand_names (brand_name, generic_name) VALUES
 	('tylenol',     'acetaminophen'),

@@ -180,14 +180,55 @@ app.post("/api/prescriptions", async (req, res) => {
       [user.id, name, dosage, type, value]
     );
 
+    const dosageWarnings = [];
+
+    const dosageMatch = dosage.match(/(\d+(\.\d+)?)/);
+    const dosageAmount = dosageMatch ? parseFloat(dosageMatch[1]) : null;
+
+    if (dosageAmount) {
+      const [[dosageBrand]] = await pool.query(
+        "SELECT generic_name FROM brand_names WHERE brand_name = ?", [name]
+      ).catch(() => [[null]]);
+
+      const isOTC = !!dosageBrand;
+      const dosageGeneric = dosageBrand ? dosageBrand.generic_name : name;
+
+      const [[limit]] = await pool.query(
+        "SELECT max_single, max_daily, max_single_otc, max_daily_otc, unit FROM dosage_limits WHERE generic_name = ?",
+        [dosageGeneric]
+      ).catch(() => [[null]]);
+
+      if (limit) {
+
+        const maxSingle = (isOTC && limit.max_single_otc) ? limit.max_single_otc : limit.max_single;
+        const maxDaily = (isOTC && limit.max_single_otc) ? limit.max_daily_otc : limit.max_daily;
+        const limitType = isOTC ? "OTC" : "prescribed";
+
+        if (dosageAmount > maxSingle) {
+          dosageWarnings.push({
+            type: "single",
+            message: `Single ${limitType} does of ${dosageAmount}${limit.unit} exceeds safe limit of ${maxSingle}${limit.unit} for ${name}.`,
+          });
+        }
+
+        const dosesPerDay = type === "daily" ? 1 : Math.floor(24 / value);
+        const dailyTotal = dosageAmount * dosesPerDay;
+
+        if (dailyTotal > maxDaily) {
+          dosageWarnings.push({
+            type: "daily",
+            message: `Daily ${limitType} total of ${dailyTotal}${limit.unit} (${dosesPerDay} doses x ${dosageAmount}${limit.unit}) exceeds safe daily limit of ${maxDaily}${limit.unit} for ${name}.`,
+          });
+        }
+      }
+    }
+
     res.status(201).json({
       id: result.insertId,
-      name, 
-      dosage, 
-      type, 
-      value,
+      name, dosage, type, value,
       last_taken: null,
       interactions,
+      dosageWarnings,
     });
   } catch (err) {
     console.error("Add prescription error:", err);

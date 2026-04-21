@@ -79,13 +79,42 @@ class PrescriptionManager {
                     });
 
                     const entry = document.createElement("div");
-                    entry.className = "error active";
+                    entry.className = `error active alert-${i.severity}`;
                     entry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${msg}`;
                     alertsList.appendChild(entry);
                 }
             } else {
 
                 document.getElementById("interactionWarning").classList.remove("active");
+            }
+
+            if (med.dosageWarnings && med.dosageWarnings.length > 0) {
+                const warningEl = document.getElementById("interactionWarning");
+                const alertsList = document.getElementById("alertsList");
+
+                const existing = warningEl.innerHTML;
+                const msgs = med.dosageWarnings.map(w => `<strong>DOSAGE:</strong> ${w.message}`);
+
+                warningEl.innerHTML = existing ? existing + "<br>" + msgs.join("<br>") : msgs.join("<br>");
+                warningEl.classList.add("active");
+
+                for (const w of med.dosageWarnings) {
+                    const msg = `<strong>DOSAGE:</strong> ${w.message}`;
+
+                    await fetch("/api/alerts", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "x-username": sessionStorage.getItem("user"),
+                        },
+                        body: JSON.stringify({ message: msg, severity: "severe" }),
+                    });
+
+                    const entry = document.createElement("div");
+                    entry.className = "error active";
+                    entry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${msg}`;
+                    alertsList.appendChild(entry);
+                }
             }
 
             document.getElementById("name").value = "";
