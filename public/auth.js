@@ -28,6 +28,10 @@ class Auth {
             userError.innerText = "Username must be filled in.";
             userError.classList.add("active");
             valid = false;
+        } else if (username.length > 50) {
+            userError.innerText = "Username too long.";
+            userError.classList.add("active");
+            valid = false;
         }
 
         if (!password) {

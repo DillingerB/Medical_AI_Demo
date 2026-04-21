@@ -9,7 +9,7 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  height: 100vh;
+  height: 86vh;
 }
 
 a {
@@ -344,7 +344,7 @@ background-image: linear-gradient(to right, rgb(180, 180, 255), rgb(255, 177, 25
 background-clip: text;
 color: transparent;
 display: inline-block;
-margin-left: 65px;
+margin-left: 37px;
 }
 
 #welcome {
