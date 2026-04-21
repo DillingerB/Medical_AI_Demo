@@ -339,7 +339,6 @@ label[for="patient"], label[for="medical-providor"] {
 }
 
 #logo {
-  
 background-image: linear-gradient(to right, rgb(180, 180, 255), rgb(255, 177, 255));
 -webkit-background-clip: text;
 background-clip: text;

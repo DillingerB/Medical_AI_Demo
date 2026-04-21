@@ -18,7 +18,7 @@ class TimerManager {
 
     //The actual timer
     tick() {
-        let closest = Infinity;
+        let remainingTimes = [];
 
         prescriptions.items.forEach(m => {
             document.querySelectorAll(`[id="t-${m.id}"]`).forEach(el => {
@@ -36,16 +36,18 @@ class TimerManager {
 
             el.innerText = `${h}:${this.pad(m2)}:${this.pad(s)}`;
 
-            if (remaining < closest) closest = remaining;
+            if (remaining > 0) remainingTimes.push(remaining);
         });
     });
 
         const closestEl = document.getElementById("closestTimer");
         if(!closestEl) return;
 
-        if (closest === Infinity) {
+        if (remainingTimes.length === 0) {
             closestEl.innerText = "None";
         } else {
+            remainingTimes.sort((a,b) => a - b);
+            const closest = remainingTimes[0];
             const h = Math.floor(closest / 3600);
             const m = Math.floor((closest % 3600) / 60);
             const s = Math.floor(closest % 60);

@@ -1,3 +1,5 @@
+let providerItems = [];
+
 // TAB SYSTEM
 function showTab(tab) {
   document.querySelectorAll(".tab").forEach(t => t.classList.add("hidden"));
@@ -107,6 +109,27 @@ function initProvider() {
 
   loadPatients();
   loadAlerts();
+
+  setInterval(() => {
+    providerItems.forEach(p => {
+      const span = document.getElementById(`t-${p.id}`);
+      if (!span) return;
+
+      if (!p.last_taken) {
+        span.innerTest = "Not started";
+        return;
+      }
+
+      const limit = p.value * 3600;
+      const remaining = Math.max(0, limit - (Date.now() - new Date(p.last_taken).getTime()) / 1000);
+
+      const h = Math.floor(remaining / 3600);
+      const m = Math.floor((remaining % 3600) / 60);
+      const s = Math.floor(remaining % 60);
+
+      span.innerText = `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    });
+  }, 1000);
 }
 
 async function loadPatients() {
@@ -127,7 +150,10 @@ async function loadPatients() {
 
     patients.forEach(patient => {
       const prescriptions = patient.prescriptions.length > 0 ? patient.prescriptions.map(p => `
-        <div class="card">
+        <div class="card"
+            data-last-taken="${p.last_taken || ''}"
+            data-value = "${p.value}"
+            data-span-id="${p.id}">
           <h3>${p.name} (${p.dosage}</h3>
           <p>Every ${p.value} ${p.type}</p>
           <p>Timer: <span id="t-${p.id}">${calcTimer(p.last_taken, p.value)}</span></p>
@@ -157,6 +183,13 @@ async function loadPatients() {
           <div id="patient-alerts-${patient.username}"></div>
         </div>
         `;
+    });
+
+    providerItems = [];
+    patients.forEach(patient => {
+      patient.prescriptions.forEach(p => {
+        providerItems.push({...p, patientUsername: patient.username});
+      });
     });
   } catch (err) {
     console.error("Load patients error:", err);
