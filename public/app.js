@@ -164,9 +164,9 @@ async function loadPatients() {
         el.innerHTML += `
         <div class="patient-card">
           <h2> ${patient.username}</h2>
-          <div class="card-grid">${prescriptions}</div>
           <button onclick="showSendForm('${patient.username}')">Send Prescription</button>
           <button onclick="loadPatientAlerts('${patient.username}')">View Alerts</button>
+          <div class="card-grid">${prescriptions}</div>
           <div id="send-form-${patient.username}" class="hidden">
             <input type="text" id="send-name-${patient.username}" placeholder="Medication">
             <input type="text" id="send-dosage-${patient.username}" placeholder="Dosage">

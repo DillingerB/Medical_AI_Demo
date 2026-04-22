@@ -7,13 +7,17 @@
 </head>
 <body>
 
+<!-- side Bar -->
 <div class="sidebar">
+  <!-- our logo, if you change it, change it on provider to, DO NOT CHANGE ID, then it will be more work than just changing logo name -->
   <h3 id="logo">Med Check AI</h3>
+  <!-- If you click any of these buttons, it changes just the side screen, not the html at all. -->
   <button onclick="showTab('home')">Home</button>
   <button onclick="showTab('about')">About</button>
   <button onclick="showTab('prescription')">Prescription</button>
   <button onclick="showTab('alerts')">Notifications</button>
   <button onclick="showTab('link')">Link Provider</button>
+  <!-- Does not directly log out user, but just sends user to index.html, works for a demo -->
   <a href="index.html"><button>Log-Out</button></a>
 </div>
 
@@ -97,6 +101,7 @@
     <div id="alertsList"></div>
   </div>
 
+<!-- Provider link for patients -->
   <div id="link" class="tab hidden">
     <h1>Link your medical provider</h1>
     <div id="pre_form">
