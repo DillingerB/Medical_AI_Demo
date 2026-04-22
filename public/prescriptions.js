@@ -23,6 +23,7 @@ class PrescriptionManager {
         const dosage = document.getElementById("dosage").value.trim();
         const type = document.getElementById("type").value;
         let value = document.getElementById("value").value;
+        const amount = parseInt(document.getElementById("amount").value) || 1;
 
         if (type === "daily") {
             value = 24;
@@ -30,7 +31,7 @@ class PrescriptionManager {
             value = parseInt(value);
         }
 
-        if (!name || !dosage || !type || (type === "hours" && !value)) {
+        if (!name || !dosage || !type || (type === "hours" && !value) || !amount) {
             alert("All fiields are required.");
             return;
         }
@@ -40,13 +41,18 @@ class PrescriptionManager {
             return;
         }
 
+        if (amount < 1) {
+            alert("Amount must be at least 1.");
+            return;
+        }
+
         try {
             const res = await fetch("/api/prescriptions", {
                 method: "POST",
                 headers: {"Content-Type": "application/json", 
                     "x-username": sessionStorage.getItem("user"),
                  },
-                body: JSON.stringify({ name, dosage, type, value }),
+                body: JSON.stringify({ name, dosage, type, value, amount }),
             });
 
             if (!res.ok) throw new Error("Failed to add prescription");
@@ -121,6 +127,7 @@ class PrescriptionManager {
             document.getElementById("dosage").value = "";
             document.getElementById("type").value = "";
             document.getElementById("value").value = "";
+            document.getElementById("amount").value = "";
         } catch (err) {
             console.error("Add prescription error:", err);
             alert("Could not save prescription. Please try again.");
@@ -197,7 +204,7 @@ class PrescriptionManager {
     card(m, showButtons) {
     return `
       <div class="card" id="card-${m.id}">
-        <h3>${m.name} (${m.dosage})</h3>
+        <h3>${m.name} (${m.dosage}mg x ${m.amount})</h3>
         <p>Every ${m.value} ${m.type}</p>
  
         ${showButtons ? `

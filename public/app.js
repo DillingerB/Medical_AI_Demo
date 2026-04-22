@@ -176,6 +176,7 @@ async function loadPatients() {
               <option value="daily">Daily</option>
             </select>
             <input type="number" id="send-value-${patient.username}" placeholder="Value">
+            <input type="number" id="send-amount-${patient.username}" placeholder="Pills Per Dose">
             <button onclick="sendPrescription('${patient.username}')">Send</button>
             <div class="error" id="send-error-${patient.username}"></div>
             <div class="hint" id="send-hint-${patient.username}"></div>

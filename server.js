@@ -102,7 +102,7 @@ app.get("/api/prescriptions", async (req, res) => {
 
   try {
     const [rows] = await pool.query(
-      `SELECT p.id, p.name, p.dosage, p.type, p.value, p.last_taken
+      `SELECT p.id, p.name, p.dosage, p.type, p.value, p.amount, p.last_taken
        FROM prescriptions p
        JOIN users u ON u.id = p.user_id
        WHERE u.username = ?
@@ -121,7 +121,7 @@ app.post("/api/prescriptions", async (req, res) => {
   const username = getCurrentUser(req);
   if (!username) return res.status(401).json({ error: "Not authenticated." });
 
-  const { name, dosage, type, value } = req.body;
+  const { name, dosage, type, value, amount } = req.body;
 
   if (!name || !dosage || !type || value == null) {
     return res.status(400).json({ error: "All fields are required." });
@@ -176,14 +176,15 @@ app.post("/api/prescriptions", async (req, res) => {
     }
 
     const [result] = await pool.query(
-      "INSERT INTO prescriptions (user_id, name, dosage, type, value) VALUES (?, ?, ?, ?, ?)",
-      [user.id, name, dosage, type, value]
+      "INSERT INTO prescriptions (user_id, name, dosage, type, value, amount) VALUES (?, ?, ?, ?, ?, ?)",
+      [user.id, name, dosage, type, value, amount]
     );
 
     const dosageWarnings = [];
 
     const dosageMatch = dosage.match(/(\d+(\.\d+)?)/);
-    const dosageAmount = dosageMatch ? parseFloat(dosageMatch[1]) : null;
+    const dosagePerPill = dosageMatch ? parseFloat(dosageMatch[1]) : null;
+    const dosageAmount = dosagePerPill ? dosagePerPill * amount : null;
 
     if (dosageAmount) {
       const [[dosageBrand]] = await pool.query(
@@ -207,7 +208,7 @@ app.post("/api/prescriptions", async (req, res) => {
         if (dosageAmount > maxSingle) {
           dosageWarnings.push({
             type: "single",
-            message: `Single ${limitType} does of ${dosageAmount}${limit.unit} exceeds safe limit of ${maxSingle}${limit.unit} for ${name}.`,
+            message: `Single ${limitType} does of ${dosageAmount}${limit.unit}  (${amount} pill(s) x ${dosagePerPill}${limit.unit})exceeds safe limit of ${maxSingle}${limit.unit} for ${name}.`,
           });
         }
 
@@ -217,7 +218,7 @@ app.post("/api/prescriptions", async (req, res) => {
         if (dailyTotal > maxDaily) {
           dosageWarnings.push({
             type: "daily",
-            message: `Daily ${limitType} total of ${dailyTotal}${limit.unit} (${dosesPerDay} doses x ${dosageAmount}${limit.unit}) exceeds safe daily limit of ${maxDaily}${limit.unit} for ${name}.`,
+            message: `Daily ${limitType} total of ${dailyTotal}${limit.unit} (${dosesPerDay} doses x ${amount} pill(s) x ${dosagePerPill}${limit.unit}) exceeds safe daily limit of ${maxDaily}${limit.unit} for ${name}.`,
           });
         }
       }
@@ -225,7 +226,7 @@ app.post("/api/prescriptions", async (req, res) => {
 
     res.status(201).json({
       id: result.insertId,
-      name, dosage, type, value,
+      name, dosage, type, value, amount,
       last_taken: null,
       interactions,
       dosageWarnings,
