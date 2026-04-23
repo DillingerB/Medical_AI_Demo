@@ -367,3 +367,27 @@ function clearBadge() {
   sessionStorage.setItem("alertsLastSeen", Date.now().toString());
   updateBadge(0);
 }
+
+async function deleteAccount() {
+  const confirmed = confirm("Are you sure you want to delete your account. This cannot be undone.");
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch("/api/auth/delete", {
+      method: "DELETE",
+      headers: { "x-username": sessionStorage.getItem("user") },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Could not delete account");
+      return;
+    }
+
+    sessionStorage.clear();
+    window.location.href = "index.html";
+  } catch (err){
+    console.error("Delete Account Error:", err);
+  }
+}

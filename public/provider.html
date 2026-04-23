@@ -13,8 +13,13 @@
   <button id="homeTab" onclick="showTab('home')">Home</button>
   <button id="aboutTab" onclick="showTab('about')">About</button>
   <button id="patientsTab" onclick="showTab('patients')">My Patients</button>
-  <button id="alertsTab" onclick="showTab('alerts')">Notifications</button>
+  <div class="sidebar-notif-wrapper">
+    <button onclick="showTab('alerts')">Notifications</button>
+    <div class="notif-badge" id="notifBadge">0</div>
+  </div>
+  <div class="bottomBar"></div>
   <a href="index.html"><button id="logoutTab">Log-Out</button></a>
+  <button onclick="deleteAccount()" id="deleteBtn">Delete Account</button>
 </div>
 
 <div class="main">

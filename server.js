@@ -516,6 +516,26 @@ app.get("/api/alerts", async (req, res) => {
   }
 });
 
+app.delete("/api/auth/delete", async (req, res) => {
+  const username = getCurrentUser(req);
+  if (!username) return res.status(401).json({ error: "Not authenticated." });
+
+  try {
+    const [result] = await pool.query(
+      "DELETE FROM users WHERE username = ?", [username]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found"});
+    }
+
+    res.json({message: "Account deleted"});
+  } catch (err) {
+    console.error("Delete account error:", err);
+    res.status(500).json({ error: "Internal server error"});
+  }
+});
+
 //actualy server
 app.listen(PORT, () => {
   console.log(`MedAI server running at http://localhost:${PORT}`);

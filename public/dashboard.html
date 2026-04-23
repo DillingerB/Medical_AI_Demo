@@ -19,10 +19,17 @@
     <button onclick="showTab('alerts')">Notifications</button>
     <div class="notif-badge" id="notifBadge">0</div>
   </div>
+
   <button onclick="showTab('link')">Link Provider</button>
-  <!-- Does not directly log out user, but just sends user to index.html, works for a demo -->
-  <a href="index.html"><button>Log-Out</button></a>
+
+  <div class="bottomBar">
+    <!-- Does not directly log out user, but just sends user to index.html, works for a demo -->
+    <a href="index.html"><button>Log-Out</button></a>
+    <button onclick="deleteAccount()" id="deleteBtn">Delete Account</button>
+  </div>
 </div>
+
+
 
 <div class="main">
   <h1 id="welcome"></h1>
@@ -105,7 +112,7 @@
     <div id="alertsList"></div>
   </div>
 
-<!-- Provider link for patients -->
+  <!-- Provider link for patients -->
   <div id="link" class="tab hidden">
     <h1>Link your medical provider</h1>
     <div id="pre_form">
