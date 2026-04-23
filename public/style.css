@@ -415,11 +415,11 @@ margin-left: 37px;
   background: red;
   color: white;
   border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 11px;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
   font-weight: bold;
-  line-height: 18px;
+  line-height: 24px;
   text-align: center;
   pointer-events: none;
 
