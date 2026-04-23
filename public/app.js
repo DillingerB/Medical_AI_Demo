@@ -1,9 +1,12 @@
 let providerItems = [];
+let lastBadgeCount = 0;
 
 // TAB SYSTEM
 function showTab(tab) {
   document.querySelectorAll(".tab").forEach(t => t.classList.add("hidden"));
   document.getElementById(tab).classList.remove("hidden");
+
+  if (tab === "alerts") clearBadge();
 }
 
 async function loadAlerts() {
@@ -15,10 +18,18 @@ async function loadAlerts() {
     const alertsList = document.getElementById("alertsList");
     if (!alertsList) return;
 
+    const lastSeen = parseInt(sessionStorage.getItem("alertsLastSeen") || "0");
+    const unread = alerts.filter(a => new Date(a.created_at).getTime() > lastSeen).length;
+    updateBadge(unread);
+
+    const alertsTab = document.getElementById("alerts");
+    if (alertsTab && !alertsTab.classList.contains("hidden")) return;
+
     alertsList.innerHTML = "";
 
     if (alerts.length === 0) {
       alertsList.innerHTML = "<p>No alerts yet.</p>";
+      updateBadge(0);
       return;
     }
 
@@ -91,6 +102,8 @@ function initDashboard() {
   prescriptions.load().then(() => {
     timer.start();
     loadAlerts();
+
+    setInterval(loadAlerts, 1000);
   });
 }
 
@@ -109,6 +122,8 @@ function initProvider() {
 
   loadPatients();
   loadAlerts();
+
+  setInterval(loadAlerts, 1000);
 
   setInterval(() => {
     providerItems.forEach(p => {
@@ -154,7 +169,7 @@ async function loadPatients() {
             data-last-taken="${p.last_taken || ''}"
             data-value = "${p.value}"
             data-span-id="${p.id}">
-          <h3>${p.name} (${p.dosage}</h3>
+          <h3>${p.name} (${p.dosage}mg per ${p.amount} pill)</h3>
           <p>Every ${p.value} ${p.type}</p>
           <p>Timer: <span id="t-${p.id}">${calcTimer(p.last_taken, p.value)}</span></p>
         </div>
@@ -166,7 +181,7 @@ async function loadPatients() {
           <h2> ${patient.username}</h2>
           <button onclick="showSendForm('${patient.username}')">Send Prescription</button>
           <button onclick="loadPatientAlerts('${patient.username}')">View Alerts</button>
-          <div class="card-grid">${prescriptions}</div>
+          
           <div id="send-form-${patient.username}" class="hidden">
             <input type="text" id="send-name-${patient.username}" placeholder="Medication">
             <input type="text" id="send-dosage-${patient.username}" placeholder="Dosage">
@@ -181,7 +196,8 @@ async function loadPatients() {
             <div class="error" id="send-error-${patient.username}"></div>
             <div class="hint" id="send-hint-${patient.username}"></div>
           </div>
-          <div id="patient-alerts-${patient.username}"></div>
+          <div id="patient-alerts-${patient.username}" class="hidden"></div>
+          <div class="card-grid">${prescriptions}</div>
         </div>
         `;
     });
@@ -207,6 +223,7 @@ async function sendPrescription(patientUsername) {
   const dosage = document.getElementById(`send-dosage-${patientUsername}`).value.trim()
   const type = document.getElementById(`send-type-${patientUsername}`).value
   let value = document.getElementById(`send-value-${patientUsername}`).value
+  const amount = parseInt(document.getElementById(`send-amount-${patientUsername}`).value) || 1;
 
   const errorEl = document.getElementById(`send-error-${patientUsername}`);
   const successEl = document.getElementById(`send-hint-${patientUsername}`);
@@ -235,7 +252,7 @@ async function sendPrescription(patientUsername) {
         "Content-Type": "application/json",
         "x-username": sessionStorage.getItem("user"),
       },
-      body: JSON.stringify({ patientUsername, name, dosage, type, value }),
+      body: JSON.stringify({ patientUsername, name, dosage, type, value, amount }),
     });
 
     const data = await res.json();
@@ -253,6 +270,7 @@ async function sendPrescription(patientUsername) {
     document.getElementById(`send-dosage-${patientUsername}`).value = "";
     document.getElementById(`send-type-${patientUsername}`).value = "";
     document.getElementById(`send-value-${patientUsername}`).value = "";
+    document.getElenentById(`send-amount-${patientUsername}`).value = "";
 
     loadPatients();
   } catch (err) {
@@ -263,6 +281,11 @@ async function sendPrescription(patientUsername) {
 async function loadPatientAlerts(patientUsername) {
   const el = document.getElementById(`patient-alerts-${patientUsername}`);
   if (!el) return;
+
+  if (!el.classList.contains("hidden")) {
+    el.classList.add("hidden");
+    return;
+  }
 
   try {
     const res = await fetch(`/api/patients/${patientUsername}/alerts`, {
@@ -275,7 +298,7 @@ async function loadPatientAlerts(patientUsername) {
     if (alerts.length === 0) {
       el.innerHTML += "<p>No alerts.</p>";
       return;
-    }
+    } else {
 
     alerts.forEach(alert => {
       const time = new Date(alert.created_at).toLocaleString();
@@ -284,6 +307,9 @@ async function loadPatientAlerts(patientUsername) {
       entry.innerHTML = `<strong>${time}</strong> - ${alert.message}`;
       el.appendChild(entry);
     });
+    }
+
+    el.classList.remove("hidden");
   } catch (err) {
     console.error("Load patient alerts error:", err);
   }
@@ -311,4 +337,33 @@ function calcTimer(lastTaken, value) {
   const s = Math.floor(remaining % 60);
   
   return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+
+function updateBadge(count) {
+  const badge = document.getElementById("notifBadge");
+  if(!badge) return;
+
+  if (count > 0) {
+    const newCount = count > 99 ? "99+" : count;
+    badge.innerText = newCount;
+
+    if (count > lastBadgeCount) {
+
+      badge.classList.remove("pop");
+      void badge.offsetWidth;
+      badge.classList.add("pop", "visible");
+    } else {
+      badge.classList.add("visible");
+      badge.classList.remove("pop");
+    }
+  } else {
+    badge.classList.remove("visible", "pop");
+  }
+
+  lastBadgeCount = count;
+}
+
+function clearBadge() {
+  sessionStorage.setItem("alertsLastSeen", Date.now().toString());
+  updateBadge(0);
 }

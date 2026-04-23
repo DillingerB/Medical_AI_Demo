@@ -204,7 +204,7 @@ class PrescriptionManager {
     card(m, showButtons) {
     return `
       <div class="card" id="card-${m.id}">
-        <h3>${m.name} (${m.dosage}mg x ${m.amount})</h3>
+        <h3>${m.name} (${m.amount} pill per ${m.dosage}mg)</h3>
         <p>Every ${m.value} ${m.type}</p>
  
         ${showButtons ? `

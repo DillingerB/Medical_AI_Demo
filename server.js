@@ -242,7 +242,7 @@ app.post("/api/prescriptions/send", async (req, res) => {
   const username = getCurrentUser(req);
   if (!username) return res.status(401).json({ error: "Not authenticated."});
 
-  const { patientUsername, name, dosage, type, value } = req.body;
+  const { patientUsername, name, dosage, type, value, amount } = req.body;
 
   if (!patientUsername || !name || !dosage || !type || !value == null) {
     return res.status(400).json({ error: "All fields are required." });
@@ -293,8 +293,8 @@ app.post("/api/prescriptions/send", async (req, res) => {
     }
 
     const [result] = await pool.query(
-      "INSERT INTO prescriptions (user_id, name, dosage, type, value) VALUES (?, ?, ?, ?, ?)",
-      [patient.id, name, dosage, type, value]
+      "INSERT INTO prescriptions (user_id, name, dosage, type, value, amount) VALUES (?, ?, ?, ?, ?, ?)",
+      [patient.id, name, dosage, type, value, amount]
     );
 
     if (interactions.length > 0) {
@@ -413,7 +413,7 @@ app.get("/api/patients", async (req, res) => {
 
   try {
     const [rows] = await pool.query(
-      `SELECT u.username, u.id, p.id AS presc_id, p.name, p.dosage, p.type, p.value, p.last_taken
+      `SELECT u.username, u.id, p.id AS presc_id, p.name, p.dosage, p.type, p.value, p.amount, p.last_taken
       FROM users u
       JOIN patient_provider pp ON pp.patient_id = u.id
       JOIN users prov ON prov.id = pp.provider_id
@@ -430,7 +430,7 @@ app.get("/api/patients", async (req, res) => {
       }
       if (row.presc_id) {
         patients[row.username].prescriptions.push({
-          id: row.presc_id, name: row.name, dosage: row.dosage, type: row.type, value: row.value, last_taken: row.last_taken,
+          id: row.presc_id, name: row.name, dosage: row.dosage, type: row.type, value: row.value, amount: row.amount, last_taken: row.last_taken,
         });
       }
     });

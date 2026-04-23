@@ -15,7 +15,10 @@
   <button onclick="showTab('home')">Home</button>
   <button onclick="showTab('about')">About</button>
   <button onclick="showTab('prescription')">Prescription</button>
-  <button onclick="showTab('alerts')">Notifications</button>
+  <div class="sidebar-notif-wrapper">
+    <button onclick="showTab('alerts')">Notifications</button>
+    <div class="notif-badge" id="notifBadge">0</div>
+  </div>
   <button onclick="showTab('link')">Link Provider</button>
   <!-- Does not directly log out user, but just sends user to index.html, works for a demo -->
   <a href="index.html"><button>Log-Out</button></a>
@@ -87,7 +90,7 @@
       </select>
 
       <input type="number" id="value" placeholder="Value">
-      <input type="number" id="amount" placeholder="pills per dose">
+      <input type="number" id="amount" placeholder="Pills Per Dose">
 
       <button id="add" onclick="prescriptions.add()">Add</button>
       <div class="error" id="interactionWarning"></div>
