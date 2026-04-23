@@ -273,9 +273,10 @@ async function sendPrescription(patientUsername) {
     document.getElementById(`send-dosage-${patientUsername}`).value = "";
     document.getElementById(`send-type-${patientUsername}`).value = "";
     document.getElementById(`send-value-${patientUsername}`).value = "";
-    document.getElenentById(`send-amount-${patientUsername}`).value = "";
+    document.getElementById(`send-amount-${patientUsername}`).value = "";
 
      await loadPatients();
+     showSendForm(patientUsername);
   } catch (err) {
     console.error("Send prescription error:", err);
   }
