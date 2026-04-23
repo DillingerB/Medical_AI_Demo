@@ -502,14 +502,37 @@ app.get("/api/alerts", async (req, res) => {
   if (!username) return res.status(401).json({ error: "Not authenticated." });
 
   try {
-    const [rows] = await pool.query(
-      `SELECT a.message, a.severity, a.created_at
-      FROM alerts a
-      JOIN users u on u.id = a.user_id
-      WHERE u.username = ? ORDER BY a.created_at DESC`,
-      [username]
+    const [[user]] = await pool.query(
+      "SELECT id, role FROM users WHERE username = ?", [username]
     );
-    res.json(rows);
+    if (!user) return res.status(401).json({ error: "User not found." });
+
+    const [ownAlerts] = await pool.query(
+      `SELECT a.message, a.severity, a.created_at, ? AS patient_name
+      FROM alerts a
+      WHERE a.user_id = ?
+      ORDER BY a.created_at DESC`,
+      [null, user.id]
+    );
+
+    if (user.role === "provider") {
+      const [patientAlerts] = await pool.query(
+        `SELECT a.message, a.severity, a.created_at, u.username AS patient_name
+        FROM alerts a
+        JOIN users u ON u.id = a.user_id
+        JOIN patient_provider pp ON pp.patient_id = u.id
+        WHERE pp.provider_id = ?
+        ORDER BY a.created_at DESC`,
+        [user.id]
+      );
+
+      const combined = [...ownAlerts, ...patientAlerts].sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+      return res.json(combined);
+    }
+
+    res.json(ownAlerts);
   } catch (err) {
     console.error("Get alerts error:", err);
     res.status(500).json({ error: "Internal server error." });

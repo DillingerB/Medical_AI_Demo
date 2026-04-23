@@ -37,7 +37,10 @@ async function loadAlerts() {
       const time = new Date(alert.created_at).toLocaleString([], {hour: '2-digit', minute: '2-digit'}) ;
       const entry = document.createElement("div");
       entry.className = `error active alert-${alert.severity}`;
-      entry.innerHTML = `<strong>${time}</strong> - ${alert.message}`;
+
+      const patientLabel = alert.patient_name ? `<small style="display:block; front-weight:bold; margin-bottom:3px;"> ${alert.patient_name}</small>` : "";
+
+      entry.innerHTML = `${patientLabel}<strong>${time}</strong> - ${alert.message}`;
       alertsList.appendChild(entry);
     });
   } catch (err) {
@@ -272,7 +275,7 @@ async function sendPrescription(patientUsername) {
     document.getElementById(`send-value-${patientUsername}`).value = "";
     document.getElenentById(`send-amount-${patientUsername}`).value = "";
 
-    loadPatients();
+     await loadPatients();
   } catch (err) {
     console.error("Send prescription error:", err);
   }
