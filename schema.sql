@@ -2,6 +2,8 @@ CREATE DATABASE IF NOT EXISTS medical_ai_demo;
 
 USE medical_ai_demo;
 
+SELECT * FROM users;
+
 CREATE TABLE users (
   id            INT UNSIGNED    NOT NULL AUTO_INCREMENT,
   username      VARCHAR(50)     NOT NULL UNIQUE,
@@ -30,6 +32,7 @@ CREATE TABLE prescriptions (
   dosage      VARCHAR(50)     NOT NULL,
   type        ENUM('hours','daily') NOT NULL,
   value       SMALLINT UNSIGNED NOT NULL,
+  amount SMALLINT UNSIGNED NOT NULL DEFAULT 1,
   last_taken  DATETIME        DEFAULT NULL,
   created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
