@@ -139,14 +139,12 @@ class PrescriptionManager {
         const med = this.items.find(m => m.id == id);
         if (!med) return;
 
-        if (med.last_taken) {
-            const diffSeconds = (Date.now() - new Date(med.last_taken).getTime()) / 1000;
-            const limitSeconds = med.value * 3600;
+        const warningEl = document.getElementById(`warn-${id}`);
+        const alertsList = document.getElementById("alertsList");
 
-            if (diffSeconds < limitSeconds) {
-                alert("Taking more pills now could be harmful. Please wait until the timer reaches zero.");
-                return;
-            }
+        if (warningEl) {
+            warningEl.innerText = "";
+            warningEl.classList.remove("active");
         }
         
         try {
@@ -155,9 +153,35 @@ class PrescriptionManager {
                  headers: {"x-username": sessionStorage.getItem("user") },
                 });
 
-            if (!res.ok) throw new Error("Failed to record dose");
+                const data = await res.json();
+
+            if (!res.ok) {
+                if (warningEl) {
+                    warningEl.innerText = data.error;
+                    warningEl.classList.add("active");
+                }
+                await fetch("/api/alerts", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-username": sessionStorage.getItem("user"),
+                    },
+                    body: JSON.stringify({ message: `<strong>DOSAGE:</strong> ${data.error}`, severity: "severe" }),
+                });
+
+                if (alertsList) {
+                    const entry = document.createElement("div");
+                    entry.className = "error active alert-severe";
+                    entry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - <strong>DOSAGE:</strong> ${data.error}`;
+                    alertsList.appendChild(entry);
+                }
+                return;
+            }
 
             med.last_taken = new Date().toISOString();
+
+            const dosesEl = document.getElementById(`doses-${id}`);
+            if (dosesEl) dosesEl.innerText = data.dosesToday;
         } catch (err) {
             console.error("Take pill error:", err);
         }
@@ -211,6 +235,8 @@ class PrescriptionManager {
           <button onclick="prescriptions.takePill(${m.id})">Take Pill</button>
           <button>Refill</button>
           <button onclick="prescriptions.deletePrescription(${m.id})">Delete</button>
+          <p>Doses today: <span id="doses-${m.id}">${m.dosesToday || 0}</span></p>
+          <div class="error" id="warn-${m.id}"></div>
         ` : ""}
  
         <p>Timer: <span id="t-${m.id}">Not started</span></p>

@@ -101,13 +101,22 @@ app.get("/api/prescriptions", async (req, res) => {
   if (!username) return res.status(401).json({ error: "Not authenticated." });
 
   try {
+    const [[user]] = await pool.query(
+      "SELECT id FROM users WHERE username = ?", [username]
+    );
+
     const [rows] = await pool.query(
-      `SELECT p.id, p.name, p.dosage, p.type, p.value, p.amount, p.last_taken
+      `SELECT p.id, p.name, p.dosage, p.type, p.value, p.amount, p.last_taken,
+      COUNT(dl.id) AS dosesToday
        FROM prescriptions p
        JOIN users u ON u.id = p.user_id
+       LEFT JOIN dose_log dl ON dl.prescription_id = p.id
+        AND dl.user_id = ?
+        AND DATE(dl.taken_at) = CURDATE()
        WHERE u.username = ?
+       GROUP BY p.id
        ORDER BY p.created_at DESC`,
-      [username]
+      [user.id, username]
     );
     res.json(rows);
   } catch (err) {
@@ -205,17 +214,21 @@ app.post("/api/prescriptions", async (req, res) => {
         const maxDaily = (isOTC && limit.max_single_otc) ? limit.max_daily_otc : limit.max_daily;
         const limitType = isOTC ? "OTC" : "prescribed";
 
-        if (dosageAmount > maxSingle) {
+        const thisDose = dosagePerPill * amount;
+
+        const dosesPerDay = type === "daily" ? 1 : Math.floor(24 / value);
+        const dailyTotal = thisDose * dosesPerDay;
+
+        if (maxSingle && thisDose > maxSingle) {
           dosageWarnings.push({
             type: "single",
             message: `Single ${limitType} does of ${dosageAmount}${limit.unit}  (${amount} pill(s) x ${dosagePerPill}${limit.unit})exceeds safe limit of ${maxSingle}${limit.unit} for ${name}.`,
           });
         }
 
-        const dosesPerDay = type === "daily" ? 1 : Math.floor(24 / value);
-        const dailyTotal = dosageAmount * dosesPerDay;
+        
 
-        if (dailyTotal > maxDaily) {
+        if (maxDaily && dailyTotal > maxDaily) {
           dosageWarnings.push({
             type: "daily",
             message: `Daily ${limitType} total of ${dailyTotal}${limit.unit} (${dosesPerDay} doses x ${amount} pill(s) x ${dosagePerPill}${limit.unit}) exceeds safe daily limit of ${maxDaily}${limit.unit} for ${name}.`,
@@ -332,19 +345,82 @@ app.post("/api/prescriptions/:id/take", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [result] = await pool.query(
-      `UPDATE prescriptions p
-       JOIN users u ON u.id = p.user_id
-       SET p.last_taken = NOW()
-       WHERE p.id = ? AND u.username = ?`,
-      [id, username]
+    const [[user]] = await pool.query(
+      "SELECT id FROM users WHERE username = ?", [username]
+    );
+    if (!user) return res.status(401).json({ error: "User not found." });
+
+    const [[med]] = await pool.query(
+      "SELECT * FROM prescriptions WHERE id = ? AND user_id = ?",
+      [id, user.id]
+    );
+    if (!med) return res.status(404).json({ error: "Prescription not found." });
+
+    const [[doseCount]] = await pool.query(
+      `SELECT COUNT(*) AS count FROM dose_log
+      WHERE prescription_id = ? AND user_id = ?
+      AND DATE(taken_at) = CURDATE()`,
+      [id, user.id]
     );
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Prescription not found." });
+    const timesToday = doseCount.count;
+    const dosageMatch = med.dosage.match(/(\d+(\.\d+)?)/);
+    const dosagePerPill = dosageMatch ? parseFloat(dosageMatch[1]) : null;
+
+    if (dosagePerPill && med.amount) {
+      const [[brand]] = await pool.query(
+        "SELECT generic_name FROM brand_names WHERE brand_name = ?", [med.name]
+      ).catch(() => [[null]]);
+
+      const isOTC = !!brand;
+      const genericName = brand ? brand.generic_name : med.name;
+
+      const [[limit]] = await pool.query(
+        "SELECT max_single, max_daily, max_single_otc, max_daily_otc, unit FROM dosage_limits WHERE generic_name = ?",
+        [genericName]
+      ).catch(() => [[null]]);
+
+      if (limit) {
+        const maxSingle = (isOTC && limit.max_single_otc) ? limit.max_single_otc : limit.max_single;
+        const maxDaily = (isOTC && limit.max_daily_otc) ? limit.max_daily_otc : limit.max_daily;
+        const limitType = isOTC ? "OTC" : "prescribed";
+
+        const thisDose = dosagePerPill * med.amount;
+        const dailyTotal = (timesToday * thisDose) + thisDose;
+
+        if (thisDose > maxSingle) {
+          return res.status(400).json({
+            error: `This single does of ${thisDose}${limit.unit} (${med.amount} pill(s) x ${dosagePerPill}${limit.unit}) exceeds the safe ${limitType} limit of ${maxSingle}${limit.unit} for ${med.name}.`,
+            severity: "severe",
+          });
+        }
+
+        if (maxDaily && dailyTotal > maxDaily) {
+          return res.status(400).json({
+            error: `Taking this dose would bring your daily total to ${dailyTotal}${limit.unit}. You have taken ${timesToday} dose(s) today (${timesToday * thisDose}${limit.unit}). exceeding the safe ${limitType} daily limit of ${maxDaily}${limit.unit} for ${med.name}.`,
+            severity: "severe",
+          });
+        }
+      }
     }
 
-    res.json({ message: "Dose recorded." });
+    await pool.query(
+      `UPDATE prescriptions SET last_taken = NOW() WHERE id = ?`, [id]
+    );
+      
+    await pool.query(
+      "INSERT INTO dose_log (prescription_id, user_id) VALUES (?, ?)",
+      [id, user.id]
+    );
+
+    const [[newCount]] = await pool.query(
+      `SELECT COUNT(*) AS count FROM dose_log
+      WHERE prescription_id = ? AND user_id = ?
+      AND DATE(taken_at) = CURDATE()`,
+      [id, user.id]
+    );
+
+    res.json({ message: "Dose recorded.", dosesToday: newCount.count  });
   } catch (err) {
     console.error("Take pill error:", err);
     res.status(500).json({ error: "Internal server error." });

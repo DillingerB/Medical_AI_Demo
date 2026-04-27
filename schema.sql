@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS medical_ai_demo;
+CREATE DATABASE medical_ai_demo;
 
 USE medical_ai_demo;
 
@@ -71,6 +71,8 @@ CREATE TABLE alerts (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+
+
 CREATE TABLE dosage_limits (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     generic_name VARCHAR(100) NOT NULL UNIQUE,
@@ -82,8 +84,21 @@ CREATE TABLE dosage_limits (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE dose_log (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    prescription_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    taken_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (prescription_id) REFERENCES prescriptions(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 INSERT INTO dosage_limits (generic_name, max_single, max_single_otc, max_daily, max_daily_otc, unit) VALUES
-('ibuprofen', '800', '400', '3200', '1200', 'mg');
+('ibuprofen', '800', '400', '3200', '1200', 'mg'),
+('acetaminophen', '1000', '500', '4000', '4000', 'mg'),
+('naproxen', '500', '440', '1000', '660', 'mg'),
+('aspirin', '650', '650', '4000', '4000', 'mg');
 
 INSERT INTO brand_names (brand_name, generic_name) VALUES
 	('tylenol',     'acetaminophen'),
