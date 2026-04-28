@@ -471,6 +471,17 @@ app.post("/api/link", async (req, res) => {
     );
     if (!provider) return res.status(404).json({ error: "Provider not found. Check the username and code." });
 
+    //if the link from patient to provider exists
+    const[[existingLink]] = await pool.query(
+      "SELECT id FROM patient_provider WHERE patient_id = ?",
+      [patient.id]
+    );
+
+    //throw a bug
+    if (existingLink) {
+      return res.status(409).json({ error: "You are already linked to a provider, you cannot link to another provider."})
+    }
+
     await pool.query(
       "INSERT INTO patient_provider (patient_id, provider_id) VALUES (?, ?)",
       [patient.id, provider.id]

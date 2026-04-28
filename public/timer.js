@@ -35,7 +35,7 @@ class TimerManager {
             //remaining is what is left on the timer, time it started minus time current / 1000 (for mimicing seconds)
             const remaining = Math.max(0, limit - (Date.now() - new Date(m.last_taken).getTime()) / 1000);
 
-            //each hour is the remaining time divided by hour secondly hour
+            //each hour is the remaining time divided by hour (seconds hour)
             const h = Math.floor(remaining / 3600);
             //minutes - remainder of remaining and 3600 divided by 60
             const m2 = Math.floor((remaining % 3600) / 60);
